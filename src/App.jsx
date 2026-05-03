@@ -99,7 +99,7 @@ function Modal({ isOpen, onClose, onSubmit, phase }) {
               />
             </div>
 
-            <button className="modal-submit" onClick={onSubmit}>
+            <button className="modal-submit" onClick={() => onSubmit(chips, customText)}>
               Submit &amp; Join the Waitlist →
             </button>
           </>
@@ -164,7 +164,9 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalPhase, setModalPhase] = useState('form') // 'form' | 'thanks'
   const [count, setCount] = useState(0)
-  const [joinDone, setJoinDone] = useState(false)
+  const [joinDone, setJoinDone] = useState(
+    () => !!localStorage.getItem('candor_joined')
+  )
   const [copyLabel, setCopyLabel] = useState('Copy Link')
 
   /* ── Animated counter (0 → 312) ─── */
@@ -193,36 +195,46 @@ export default function App() {
       setTimeout(() => setEmailError(false), 1800)
       return
     }
+    const joined = localStorage.getItem('candor_joined')
+    if (joined === v) {
+      setJoinDone(true)
+      return
+    }
     setModalPhase('form')
     setModalOpen(true)
   }
 
   const closeModal = () => setModalOpen(false)
 
-  const submitModal = () => {
-    const FORM_URL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdZ6OtnZ_qYc_MYLbcWeCB53dN-Ulq2dDwNxN5cZkv_eCxGEg/formResponse'
+  const submitModal = (chips, customText) => {
+    const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdZ6OtnZ_qYc_MYLbcWeCB53dN-Ulq2dDwNxN5cZkv_eCxGEg/formResponse'
 
     const CHIP_KEYS = [
-      'True anonymity',
+      'Anonymity',
       'Verified reviews',
       'Salary data',
       'No manipulation',
     ]
 
-    const formData = new FormData()
-    formData.append('entry.1711759945', email.trim())
+    const params = new URLSearchParams()
+    params.append('entry.1711759945', email.trim())
 
-    // Checkbox field — append same key once per selected option
     chips.forEach((selected, i) => {
-      if (selected) formData.append('entry.524819314', CHIP_KEYS[i])
+      if (selected) params.append('entry.524819314', CHIP_KEYS[i])
     })
 
     if (customText.trim()) {
-      formData.append('entry.2005138302', customText.trim())
+      params.append('entry.2005138302', customText.trim())
     }
 
-    fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData })
+    fetch(FORM_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+    })
 
+    localStorage.setItem('candor_joined', email.trim())
     setModalPhase('thanks')
     setCount((n) => n + 1)
     setJoinDone(true)

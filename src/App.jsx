@@ -200,6 +200,29 @@ export default function App() {
   const closeModal = () => setModalOpen(false)
 
   const submitModal = () => {
+    const FORM_URL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdZ6OtnZ_qYc_MYLbcWeCB53dN-Ulq2dDwNxN5cZkv_eCxGEg/formResponse'
+
+    const CHIP_KEYS = [
+      'True anonymity',
+      'Verified reviews',
+      'Salary data',
+      'No manipulation',
+    ]
+
+    const formData = new FormData()
+    formData.append('entry.1711759945', email.trim())
+
+    // Checkbox field — append same key once per selected option
+    chips.forEach((selected, i) => {
+      if (selected) formData.append('entry.524819314', CHIP_KEYS[i])
+    })
+
+    if (customText.trim()) {
+      formData.append('entry.2005138302', customText.trim())
+    }
+
+    fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData })
+
     setModalPhase('thanks')
     setCount((n) => n + 1)
     setJoinDone(true)
@@ -208,12 +231,12 @@ export default function App() {
 
   const copyLink = () => {
     navigator.clipboard
-      .writeText('https://getcandor.io')
+      .writeText('https://condor-teal.vercel.app')
       .then(() => {
         setCopyLabel('Copied!')
         setTimeout(() => setCopyLabel('Copy Link'), 2000)
       })
-      .catch(() => setCopyLabel('getcandor.io'))
+      .catch(() => setCopyLabel('condor-teal.vercel.app'))
   }
 
   /* ─────────────────────────────────────────────────────────
@@ -417,7 +440,7 @@ export default function App() {
           <div className="share-btns">
             <a
               className="sbtn reddit"
-              href="https://www.reddit.com/submit?url=https://getcandor.io&title=Building%20a%20workplace%20review%20platform%20that%27s%20anonymous%20like%20Reddit%20%E2%80%94%20verified%20employees%20only%2C%20no%20corporate%20manipulation"
+              href="https://www.reddit.com/submit?url=https://condor-teal.vercel.app&title=Building%20a%20workplace%20review%20platform%20that%27s%20anonymous%20like%20Reddit%20%E2%80%94%20verified%20employees%20only%2C%20no%20corporate%20manipulation"
               target="_blank"
               rel="noreferrer"
             >
@@ -427,7 +450,7 @@ export default function App() {
 
             <a
               className="sbtn xtwit"
-              href="https://twitter.com/intent/tweet?text=Workplace%20reviews%20that%20are%20anonymous%20like%20Reddit%2C%20verified%20like%20your%20bank.%0A%0ACandor%20is%20building%20the%20review%20platform%20engineers%20actually%20deserve.%20Early%20access%3A%20https%3A%2F%2Fgetcandor.io"
+              href="https://twitter.com/intent/tweet?text=Workplace%20reviews%20that%20are%20anonymous%20like%20Reddit%2C%20verified%20like%20your%20bank.%0A%0ACandor%20is%20building%20the%20review%20platform%20engineers%20actually%20deserve.%20Early%20access%3A%20https%3A%2F%2Fcondor-teal.vercel.app"
               target="_blank"
               rel="noreferrer"
             >
